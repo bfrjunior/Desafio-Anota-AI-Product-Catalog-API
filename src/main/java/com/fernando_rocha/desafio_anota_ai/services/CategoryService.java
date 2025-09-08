@@ -1,6 +1,7 @@
 package com.fernando_rocha.desafio_anota_ai.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -41,6 +42,10 @@ public class CategoryService {
                 .orElseThrow(CategoryNotFoundException::new);
 
         this.repository.delete(category);
+    }
+
+    public Optional<Category> getById(String id) {
+        return this.repository.findById(id);
     }
 
     public List<Category> getAll() {
