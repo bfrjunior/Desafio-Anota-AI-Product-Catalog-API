@@ -12,7 +12,7 @@ public class MongoDBConfig {
     @Bean
     public MongoDatabaseFactory mongoConfigure() {
         return new SimpleMongoClientDatabaseFactory(
-                "mongodb://localhost:27017/product-catalog");
+                "mongodb://admin:password@localhost:27017/product-catalog?authSource=admin");
     }
 
     @Bean
