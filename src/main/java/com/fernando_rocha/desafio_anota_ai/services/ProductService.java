@@ -33,8 +33,10 @@ public class ProductService {
         Product product = this.repository.findById(id)
                 .orElseThrow(ProductNotFoundException::new);
 
-        this.categoryService.getById(productData.categoryId())
-                .orElseThrow(CategoryNotFoundException::new);
+        if (productData.categoryId() != null) {
+            this.categoryService.getById(productData.categoryId())
+                    .ifPresent(category -> product.setCategory(category.getId()));
+        }
 
         if (!productData.title().isEmpty())
             product.setTitle(productData.title());
@@ -42,8 +44,6 @@ public class ProductService {
             product.setDescription(productData.description());
         if (!(productData.price() == null))
             product.setPrice(productData.price());
-        if (!(productData.categoryId() == null))
-            product.setCategory(productData.categoryId());
 
         this.repository.save(product);
 
