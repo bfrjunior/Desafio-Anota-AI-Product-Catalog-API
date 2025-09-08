@@ -1,0 +1,50 @@
+package com.fernando_rocha.desafio_anota_ai.services;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.fernando_rocha.desafio_anota_ai.domain.category.Category;
+import com.fernando_rocha.desafio_anota_ai.domain.category.CategoryDTO;
+import com.fernando_rocha.desafio_anota_ai.domain.category.exceptions.CategoryNotFoundException;
+import com.fernando_rocha.desafio_anota_ai.repositories.CategoryRepository;
+
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class CategoryService {
+
+    private final CategoryRepository repository;
+
+    public Category insert(CategoryDTO categoryData) {
+        Category newCategory = new Category(categoryData);
+        this.repository.save(newCategory);
+        return newCategory;
+    }
+
+    public Category update(String id, CategoryDTO categoryData) {
+        Category category = this.repository.findById(id)
+                .orElseThrow(CategoryNotFoundException::new);
+
+        if (!categoryData.title().isEmpty())
+            category.setTitle(categoryData.title());
+        if (!categoryData.description().isEmpty())
+            category.setDescription(categoryData.description());
+        this.repository.save(category);
+
+        return category;
+    }
+
+    public void delete(String id) {
+        Category category = this.repository.findById(id)
+                .orElseThrow(CategoryNotFoundException::new);
+
+        this.repository.delete(category);
+    }
+
+    public List<Category> getAll() {
+        return this.repository.findAll();
+    }
+
+}
