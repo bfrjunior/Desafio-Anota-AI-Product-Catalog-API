@@ -9,6 +9,8 @@ import com.fernando_rocha.desafio_anota_ai.domain.category.product.Product;
 import com.fernando_rocha.desafio_anota_ai.domain.category.product.ProductDTO;
 import com.fernando_rocha.desafio_anota_ai.domain.category.product.exceptions.ProductNotFoundException;
 import com.fernando_rocha.desafio_anota_ai.repositories.ProductRepository;
+import com.fernando_rocha.desafio_anota_ai.services.aws.AwsSnsService;
+import com.fernando_rocha.desafio_anota_ai.services.aws.MessageDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,6 +20,7 @@ public class ProductService {
 
     private final CategoryService categoryService;
     private final ProductRepository repository;
+    private final AwsSnsService snsService;
 
     public Product insert(ProductDTO productData) {
         this.categoryService.getById(productData.categoryId())
@@ -25,6 +28,7 @@ public class ProductService {
         Product newProduct = new Product(productData);
 
         this.repository.save(newProduct);
+        this.snsService.publish(new MessageDTO(newProduct.toString()));
 
         return newProduct;
     }
@@ -46,6 +50,7 @@ public class ProductService {
             product.setPrice(productData.price());
 
         this.repository.save(product);
+        this.snsService.publish(new MessageDTO(product.toString()));
 
         return product;
     }
@@ -55,6 +60,7 @@ public class ProductService {
                 .orElseThrow(ProductNotFoundException::new);
 
         this.repository.delete(product);
+        this.snsService.publish(new MessageDTO(product.toString()));
     }
 
     public List<Product> getAll() {
