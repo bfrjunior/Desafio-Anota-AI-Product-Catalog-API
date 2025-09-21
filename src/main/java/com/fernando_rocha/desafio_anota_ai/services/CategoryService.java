@@ -9,6 +9,8 @@ import com.fernando_rocha.desafio_anota_ai.domain.category.Category;
 import com.fernando_rocha.desafio_anota_ai.domain.category.CategoryDTO;
 import com.fernando_rocha.desafio_anota_ai.domain.category.exceptions.CategoryNotFoundException;
 import com.fernando_rocha.desafio_anota_ai.repositories.CategoryRepository;
+import com.fernando_rocha.desafio_anota_ai.services.aws.AwsSnsService;
+import com.fernando_rocha.desafio_anota_ai.services.aws.MessageDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,10 +19,15 @@ import lombok.RequiredArgsConstructor;
 public class CategoryService {
 
     private final CategoryRepository repository;
+    private final AwsSnsService snsService;
 
     public Category insert(CategoryDTO categoryData) {
         Category newCategory = new Category(categoryData);
+
         this.repository.save(newCategory);
+
+        this.snsService.publish(new MessageDTO(newCategory.toString()));
+
         return newCategory;
     }
 
@@ -32,6 +39,9 @@ public class CategoryService {
             category.setTitle(categoryData.title());
         if (!categoryData.description().isEmpty())
             category.setDescription(categoryData.description());
+
+        this.snsService.publish(new MessageDTO(category.toString()));
+
         this.repository.save(category);
 
         return category;
@@ -42,14 +52,15 @@ public class CategoryService {
                 .orElseThrow(CategoryNotFoundException::new);
 
         this.repository.delete(category);
-    }
-
-    public Optional<Category> getById(String id) {
-        return this.repository.findById(id);
+        this.snsService.publish(new MessageDTO(category.deleteToString()));
     }
 
     public List<Category> getAll() {
         return this.repository.findAll();
+    }
+
+    public Optional<Category> getById(String id) {
+        return this.repository.findById(id);
     }
 
 }

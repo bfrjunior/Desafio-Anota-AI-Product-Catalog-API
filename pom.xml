@@ -67,6 +67,12 @@
       <artifactId>aws-java-sdk-sns</artifactId>
       <version>1.12.772</version>
    </dependency>
+
+   <dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20231013</version>
+		</dependency>
 	</dependencies>
 
 	<build>
